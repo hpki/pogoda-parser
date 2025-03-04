@@ -12,6 +12,11 @@ public class Parser {
     public static int WAITING_TIME = 3000;
     public static String URL_ADRESS = "https://pogoda.spb.ru";
 
+    public final static String MORNING = "Утро";
+    public final static String DAY = "День";
+    public final static String EVENING = "Вечер";
+    public final static String NIGHT = "Ночь";
+
 
     public static void main(String[] args) throws Exception {
         Document page = getPage();
@@ -24,7 +29,7 @@ public class Parser {
         for (Element name : names) {
             String dateString = name.select("th[id=dt]").text();
             String date = getDateFromString(dateString);
-            System.out.println(date + "                   Явления                       Темп.  Давление Влажность   Ветер");
+            System.out.println(date + "                   Явления         Темп.  Давление Влажность   Ветер");
            int iterationCount = printPartValues(values, index);
            index = index + iterationCount;
         }
@@ -35,10 +40,26 @@ public class Parser {
         int iterationCount = 4;
         if (index == 0) {
             Element valueLn = values.get(3);
-            boolean isMorning = valueLn.text().contains("Утро");
+            String partOfDay = valueLn.text();
+
+                    switch (partOfDay) {
+                        case "Утро":
+                            iterationCount = 3;
+                            break;
+                        case "День":
+                            iterationCount = 2;
+                        case "Вечер":
+                        iterationCount = 1;
+                        case "Ночь":
+                            iterationCount = 0;
+                        default:
+                            break;
+                    }
+
+           /* boolean isMorning = valueLn.text().contains("Утро");
             if (isMorning) {
                 iterationCount = 3;
-            }
+            }*/
             for(int i = 0; i < iterationCount; i++) {
                 Element valueLine = values.get(index + i);
                  for (Element td : valueLine.select("td")) {
